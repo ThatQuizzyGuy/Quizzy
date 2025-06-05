@@ -1,23 +1,20 @@
-from flask import Flask, render_template, request, send_from_directory
-from flask_socketio import SocketIO, emit, join_room, leave_room, disconnect
-import random, string
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO, join_room, leave_room, emit, disconnect
+import random
+import string
 from threading import Lock
 from time import time
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 socketio = SocketIO(app)
+
+# Your game state logic here...
+ROOMS = {}
 lock = Lock()
 
-ROOMS = {}
-QUESTIONS = [
-    {"question": "What is the capital of France?", "answers": ["Paris", "Rome", "Berlin", "Madrid"], "correct": 0},
-    {"question": "Which planet is known as the Red Planet?", "answers": ["Earth", "Mars", "Venus", "Jupiter"], "correct": 1},
-    {"question": "Who wrote 'Hamlet'?", "answers": ["Charles Dickens", "Leo Tolstoy", "William Shakespeare", "Mark Twain"], "correct": 2}
-]
-
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
 @app.route("/static/<path:filename>")
 def static_files(filename):
@@ -158,5 +155,5 @@ def get_players(code):
         for sid, info in ROOMS[code]["players"].items()
     ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     socketio.run(app, debug=True)
