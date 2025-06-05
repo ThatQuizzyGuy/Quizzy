@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quizzy Multiplayer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="background"></div>
+
+    <img src="{{ url_for('static', filename='Images/logo.png') }}" id="logo" alt="Quizzy Logo" />
+
+    <div id="notificationContainer"></div>
+
+    <div id="lobby" class="page">
+        <input id="nameInput" placeholder="Your name" />
+        <input id="roomInput" placeholder="Room code" maxlength="4" />
+        <button class="img-button" id="joinBtn">Join Room</button>
+        <button class="img-button" id="createBtn">Create Room</button>
+        <div id="lobbyMessages"></div>
+    </div>
+
+    <div id="hostControls" class="page" style="display:none;">
+        <h2>Host Controls</h2>
+        <div>Room Code: <span id="hostRoomCode"></span></div>
+        <button class="img-button" id="startBtn">Start Quiz</button>
+        <button class="img-button" id="skipBtn">Skip Question</button>
+        <div id="timerDisplay"></div>
+    </div>
+
+    <div id="playerArea" class="page" style="display:none;">
+        <h2 id="questionTitle">Question</h2>
+        <div id="questionText"></div>
+        <div id="answers"></div>
+        <div id="feedback"></div>
+        <div id="leaderboardArea" style="display:none;">
+            <h3>Leaderboard</h3>
+            <ul id="leaderboardList"></ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='client.js') }}"></script>
+</body>
+</html>
