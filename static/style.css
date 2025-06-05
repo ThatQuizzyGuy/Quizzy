@@ -1,186 +1,92 @@
-/* Fullscreen background */
-#background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('../static/Images/background.jpg');
-    background-size: cover;
-    background-position: center;
-    z-index: -10;
-    opacity: 0.8;
-}
-
-/* Logo */
-#logo {
-    display: block;
-    margin: 30px auto;
-    width: 200px;
-    animation: dropIn 1s ease-out;
-}
-
-/* General styles */
 body {
     font-family: 'Segoe UI', sans-serif;
+    background-image: url("Images/background.jpg");
+    background-size: cover;
+    margin: 0;
     color: #fff;
     text-align: center;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
 }
 
-h1, h2, h3 {
-    margin-bottom: 10px;
+#logo {
+    width: 300px;
+    margin-top: 20px;
+    animation: drop 1s ease;
 }
 
-/* Inputs */
-input {
-    padding: 12px;
-    margin: 10px;
-    border: none;
-    border-radius: 8px;
+#entryFrame {
+    background: rgba(0, 0, 0, 0.7);
+    margin: 50px auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 15px;
+    animation: slideIn 1s ease;
+}
+
+input, button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    width: 80%;
+    border-radius: 10px;
     font-size: 16px;
+    border: none;
+    outline: none;
 }
 
-/* Image-based buttons */
-.img-button {
-    background-image: url('../static/Images/button.png');
+button {
+    background-image: url("Images/button.png");
     background-size: cover;
-    background-repeat: no-repeat;
-    color: #fff;
-    font-weight: bold;
-    font-size: 18px;
-    border: none;
-    width: 180px;
-    height: 50px;
-    margin: 10px;
+    color: white;
+    text-shadow: 0 0 3px #000;
     cursor: pointer;
     transition: transform 0.1s ease;
 }
 
-.img-button:hover {
-    transform: scale(1.05);
-}
-
-.img-button:active {
+button:active {
     transform: scale(0.95);
 }
 
-/* Notification box */
-#notificationContainer {
+#notificationArea {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 999;
+    z-index: 1000;
 }
 
 .notification {
-    background-image: url('../static/Images/notification.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-color: rgba(0, 0, 0, 0.6);
-    background-position: center;
-    color: white;
-    padding: 20px 40px;
-    margin: 10px auto;
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    padding: 10px 20px;
+    margin-top: 10px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    min-width: 300px;
-    max-width: 600px;
-    animation: dropIn 0.4s ease-out;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    gap: 10px;
+    animation: fadeDrop 0.5s ease;
+}
+
+.notification img {
+    width: 24px;
+    height: 24px;
 }
 
 .notification .close {
+    margin-left: auto;
     cursor: pointer;
-    font-weight: bold;
-    margin-left: 20px;
-    font-size: 18px;
+    color: white;
 }
 
-/* Question area */
-#playerArea {
-    padding: 20px;
+@keyframes drop {
+    0% { opacity: 0; transform: translateY(-50px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
-#questionText {
-    font-size: 24px;
-    margin: 20px 0;
+@keyframes fadeDrop {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
-#answers button {
-    display: block;
-    margin: 10px auto;
-    width: 300px;
-    height: 50px;
-    font-size: 18px;
-    border: none;
-    border-radius: 8px;
-    background-color: #222;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-#answers button:hover {
-    background-color: #444;
-    transform: translateY(-2px);
-}
-
-/* Animations */
-@keyframes dropIn {
-    0% {
-        transform: translateY(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-.confetti-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 9999;
-}
-
-.confetti {
-    position: absolute;
-    top: -10px;
-    font-size: 24px;
-    animation: fall 3s linear infinite;
-}
-
-@keyframes fall {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(100vh); }
-}
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-}
-
-.modal-content {
-    background-color: #fff;
-    color: #000;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }

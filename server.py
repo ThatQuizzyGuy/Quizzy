@@ -1,136 +1,139 @@
-from flask import Flask, render_template, request
-from flask_socketio import SocketIO, join_room, leave_room, emit
-import random
-import string
+from flask import Flask, render_template, request, send_from_directory
+from flask_socketio import SocketIO, emit, join_room, leave_room, disconnect
 from threading import Lock
 from time import time
+import random
+import string
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'dda90a19d5db316ebf8cee2757d7db4f'
 socketio = SocketIO(app)
-
 ROOMS = {}
 lock = Lock()
 
 QUESTIONS = [
-    {"question": "What is the capital of France?", "answers": ["Paris", "London", "Berlin", "Madrid"], "correct": 0},
-    {"question": "What is 5 + 7?", "answers": ["10", "12", "11", "14"], "correct": 1},
-    {"question": "Which planet is closest to the Sun?", "answers": ["Earth", "Venus", "Mercury", "Mars"], "correct": 2}
+    {"q": "What is the capital of France?", "answers": ["Paris", "London", "Berlin", "Rome"], "correct": 0},
+    {"q": "What color do you get when you mix red and white?", "answers": ["Pink", "Purple", "Brown", "Orange"], "correct": 0},
 ]
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
+
+@app.route("/static/<path:path>")
+def send_static(path):
+    return send_from_directory('static', path)
 
 def generate_code():
     return ''.join(random.choices(string.ascii_uppercase, k=4))
 
 @socketio.on('create_room')
-def create_room(data):
-    name = data['name']
+def on_create(data):
     code = generate_code()
-
+    sid = request.sid
     with lock:
         ROOMS[code] = {
-            'players': {},
-            'admin_sid': request.sid,
-            'questions': QUESTIONS.copy(),
-            'current_question': -1
-        }
-        ROOMS[code]['players'][request.sid] = {
-            'name': name,
-            'score': 0,
-            'is_admin': True
+            'players': {sid: {'name': data['name'], 'score': 0, 'is_admin': True}},
+            'admin_sid': sid,
+            'started': False,
+            'question_index': 0,
+            'last_active': time()
         }
     join_room(code)
-    emit('room_joined', {'room': code, 'is_admin': True}, room=request.sid)
+    emit('room_created', {'room': code, 'is_admin': True})
+    emit('player_list', {'players': get_players(code)}, room=code)
 
 @socketio.on('join_room')
-def join(data):
+def on_join(data):
     code = data['room'].upper()
-    name = data['name']
-
-    if code in ROOMS:
-        with lock:
-            ROOMS[code]['players'][request.sid] = {
-                'name': name,
-                'score': 0,
-                'is_admin': False
-            }
-        join_room(code)
-        emit('room_joined', {'room': code, 'is_admin': False}, room=request.sid)
-        emit('player_joined', {'name': name}, room=code)
-    else:
-        emit('error', {'message': 'Room not found'}, room=request.sid)
+    sid = request.sid
+    with lock:
+        if code in ROOMS and not ROOMS[code]['started']:
+            ROOMS[code]['players'][sid] = {'name': data['name'], 'score': 0, 'is_admin': False}
+            join_room(code)
+            emit('room_joined', {'room': code, 'is_admin': False})
+            emit('player_list', {'players': get_players(code)}, room=code)
+        else:
+            emit('error', {'message': 'Room not found or already started'})
 
 @socketio.on('start_quiz')
-def start_quiz(data):
-    code = data['room']
-    room = ROOMS.get(code)
-    if room:
-        room['current_question'] = -1
-        send_next_question(code)
+def start_quiz():
+    sid = request.sid
+    with lock:
+        for code, room in ROOMS.items():
+            if room['admin_sid'] == sid:
+                room['started'] = True
+                room['question_index'] = 0
+                send_question(code)
+                break
 
-def send_next_question(code):
-    room = ROOMS.get(code)
-    if not room:
-        return
-    room['current_question'] += 1
-    if room['current_question'] >= len(room['questions']):
-        emit('quiz_ended', {}, room=code)
-        return
-
-    q = room['questions'][room['current_question']]
-    emit('new_question', {
-        'question': q['question'],
-        'answers': q['answers']
-    }, room=code)
-    emit('show_leaderboard', get_leaderboard(code), room=room['admin_sid'])
+def send_question(code):
+    room = ROOMS[code]
+    idx = room['question_index']
+    if idx < len(QUESTIONS):
+        question = QUESTIONS[idx]
+        emit('new_question', {
+            'question': question['q'],
+            'answers': question['answers']
+        }, room=code)
+    else:
+        emit('game_over', {}, room=code)
 
 @socketio.on('submit_answer')
-def submit_answer(data):
-    code = data['room']
-    answer_index = data['answer']
+def handle_answer(data):
     sid = request.sid
-    room = ROOMS.get(code)
-    if room:
-        current_q = room['questions'][room['current_question']]
-        correct = current_q['correct']
-        if answer_index == correct:
+    code = data['room']
+    answer = data['answer']
+    with lock:
+        room = ROOMS[code]
+        q = QUESTIONS[room['question_index']]
+        correct = q['correct']
+        if answer == correct:
             room['players'][sid]['score'] += 1
-            emit('answer_result', {'correct': True})
-        else:
-            emit('answer_result', {'correct': False})
+        emit('answer_result', {'correct': answer == correct})
+        if 'responses' not in room:
+            room['responses'] = set()
+        room['responses'].add(sid)
+        if len(room['responses']) >= len(room['players']) - 1:
+            show_leaderboard(code)
+
+def show_leaderboard(code):
+    room = ROOMS[code]
+    leaderboard = sorted([
+        {'name': p['name'], 'score': p['score']}
+        for p in room['players'].values()
+    ], key=lambda x: x['score'], reverse=True)
+    emit('leaderboard', {'leaderboard': leaderboard}, room=room['admin_sid'])
+    room['responses'] = set()
 
 @socketio.on('next_question')
-def next_question(data):
-    send_next_question(data['room'])
+def next_q():
+    sid = request.sid
+    for code, room in ROOMS.items():
+        if room['admin_sid'] == sid:
+            room['question_index'] += 1
+            send_question(code)
+            break
+
+def get_players(code):
+    return [{'name': p['name'], 'score': p['score'], 'is_admin': p['is_admin']} for p in ROOMS[code]['players'].values()]
 
 @socketio.on('disconnect')
-def on_disconnect():
+def disconnect_handler():
     sid = request.sid
     with lock:
         for code, room in list(ROOMS.items()):
             if sid in room['players']:
-                is_admin = room['players'][sid]['is_admin']
                 del room['players'][sid]
-                if is_admin and room['players']:
-                    new_admin_sid = next(iter(room['players']))
-                    room['admin_sid'] = new_admin_sid
-                    room['players'][new_admin_sid]['is_admin'] = True
-                    emit('new_admin', {'sid': new_admin_sid}, room=code)
-                elif not room['players']:
-                    del ROOMS[code]
+                if sid == room['admin_sid']:
+                    if room['players']:
+                        new_sid = next(iter(room['players']))
+                        room['admin_sid'] = new_sid
+                        room['players'][new_sid]['is_admin'] = True
+                        emit('new_admin', {'sid': new_sid}, room=code)
+                    else:
+                        del ROOMS[code]
+                emit('player_list', {'players': get_players(code)}, room=code)
                 break
 
-def get_leaderboard(code):
-    room = ROOMS.get(code)
-    if not room:
-        return []
-    return sorted(
-        [{'name': p['name'], 'score': p['score']} for p in room['players'].values()],
-        key=lambda x: x['score'], reverse=True
-    )
-
 if __name__ == '__main__':
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=True)
