@@ -1,40 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Quizzy Multiplayer</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quizzy Game</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <img src="{{ url_for('static', filename='Images/logo.png') }}" id="logo">
+  <img src="{{ url_for('static', filename='Images/logo.png') }}" id="logo" />
 
-    <div id="entryFrame">
-        <input id="nameInput" placeholder="Your name">
-        <input id="roomInput" placeholder="Room code" maxlength="4">
-        <button id="createBtn">Create Room</button>
-        <button id="joinBtn">Join Room</button>
-    </div>
+  <div id="entryFrame">
+    <input id="nameInput" placeholder="Your Name" />
+    <input id="roomInput" placeholder="Room Code" maxlength="4"/>
+    <button id="createBtn">Create Room</button>
+    <button id="joinBtn">Join Room</button>
+  </div>
 
-    <div id="notificationArea"></div>
+  <div id="hostControls" style="display: none;">
+    <h2>Host Controls</h2>
+    <button id="startBtn">Start Quiz</button>
+    <button id="skipBtn">Skip Question</button>
+    <button id="nextBtn">Next Question</button>
+  </div>
 
-    <div id="hostControls" style="display: none;">
-        <h2>Host Panel</h2>
-        <div>Room Code: <span id="hostRoomCode"></span></div>
-        <button id="startBtn">Start Quiz</button>
-        <button id="nextBtn">Next Question</button>
-    </div>
+  <div id="questionContainer" style="display: none;">
+    <div id="questionText"></div>
+    <div id="answers"></div>
+    <div id="feedback"></div>
+    <div id="timerDisplay"></div>
+  </div>
 
-    <div id="quizArea" style="display:none;">
-        <div id="questionText"></div>
-        <div id="answers"></div>
-        <div id="feedback"></div>
-        <div id="leaderboard" style="display:none;">
-            <h3>Leaderboard</h3>
-            <ul id="leaderboardList"></ul>
-        </div>
-    </div>
+  <div id="leaderboardArea" style="display: none;">
+    <h3>Leaderboard</h3>
+    <ul id="leaderboardList"></ul>
+  </div>
 
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='client.js') }}"></script>
+  <div id="notificationBox" class="notification hidden">
+    <img src="{{ url_for('static', filename='Images/notification.png') }}" />
+    <span id="notificationText">Text here</span>
+    <button onclick="hideNotification()">×</button>
+  </div>
+
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+  <script src="{{ url_for('static', filename='client.js') }}"></script>
 </body>
 </html>

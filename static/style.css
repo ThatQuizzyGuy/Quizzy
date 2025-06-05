@@ -1,92 +1,64 @@
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background-image: url("Images/background.jpg");
-    background-size: cover;
-    margin: 0;
-    color: #fff;
-    text-align: center;
+  margin: 0;
+  padding: 0;
+  background: url("/static/Images/background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Segoe UI', sans-serif;
+  color: white;
+  text-align: center;
 }
 
 #logo {
-    width: 300px;
-    margin-top: 20px;
-    animation: drop 1s ease;
+  width: 200px;
+  margin: 20px auto;
+  display: block;
 }
 
 #entryFrame {
-    background: rgba(0, 0, 0, 0.7);
-    margin: 50px auto;
-    padding: 20px;
-    width: 300px;
-    border-radius: 15px;
-    animation: slideIn 1s ease;
+  background: url("/static/Images/frame.png") center/contain no-repeat;
+  width: 400px;
+  height: 300px;
+  margin: 0 auto;
+  padding-top: 50px;
 }
 
 input, button {
-    display: block;
-    margin: 10px auto;
-    padding: 10px;
-    width: 80%;
-    border-radius: 10px;
-    font-size: 16px;
-    border: none;
-    outline: none;
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  background: url("/static/Images/button.png") center/cover no-repeat;
+  width: 200px;
+  color: white;
 }
 
-button {
-    background-image: url("Images/button.png");
-    background-size: cover;
-    color: white;
-    text-shadow: 0 0 3px #000;
-    cursor: pointer;
-    transition: transform 0.1s ease;
-}
-
-button:active {
-    transform: scale(0.95);
-}
-
-#notificationArea {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
+button:hover {
+  background: url("/static/Images/button_hover.png") center/cover no-repeat;
+  transform: scale(1.05);
+  transition: 0.2s;
 }
 
 .notification {
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 12px;
-    padding: 10px 20px;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: fadeDrop 0.5s ease;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  padding: 10px 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000;
 }
 
 .notification img {
-    width: 24px;
-    height: 24px;
+  width: 32px;
+  height: 32px;
 }
 
-.notification .close {
-    margin-left: auto;
-    cursor: pointer;
-    color: white;
-}
-
-@keyframes drop {
-    0% { opacity: 0; transform: translateY(-50px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeDrop {
-    0% { opacity: 0; transform: translateY(-20px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+.notification.hidden {
+  display: none;
 }
