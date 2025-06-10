@@ -1,0 +1,46 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quizzy Multiplayer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='Images/logo.png') }}">
+</head>
+<body>
+  <div id="entryFrame">
+    <img id="logo" src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo">
+    <input id="nameInput" placeholder="Your name">
+    <input id="roomInput" placeholder="Room code" maxlength="4">
+    <button id="joinBtn">Join Room</button>
+    <button id="createBtn">Create Room</button>
+  </div>
+
+  <div id="hostControls" style="display: none;">
+    <h2>Host Controls</h2>
+    <button id="startBtn">Start Quiz</button>
+    <button id="skipBtn">Skip Question</button>
+    <button id="nextBtn">Next Question</button>
+  </div>
+
+  <div id="questionContainer" style="display: none;">
+    <div id="questionText"></div>
+    <div id="answers"></div>
+    <div id="feedback"></div>
+    <div id="timerDisplay"></div>
+  </div>
+
+  <div id="leaderboardArea" style="display: none;">
+    <h3>Leaderboard</h3>
+    <ul id="leaderboardList"></ul>
+  </div>
+
+  <div id="notificationBox" class="notification hidden">
+    <img src="{{ url_for('static', filename='Images/notification.png') }}" />
+    <span id="notificationText">Text here</span>
+    <button onclick="hideNotification()">×</button>
+  </div>
+
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" integrity="sha384-KA7m0DwgQGmeRC6Xre3hJO+ZxpanOauVh4Czdqbg8lDKJ3bZZYVYmP+y4F31x40L" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='client.js') }}"></script>
+</body>
+</html>
