@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: url("/static/Images/background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Segoe UI', sans-serif;
+  color: white;
+  text-align: center;
+}
+
+#logo {
+  width: 200px;
+  margin: 20px auto;
+  display: block;
+}
+
+#entryFrame {
+  background: url("/static/Images/frame.png") center/contain no-repeat;
+  width: 400px;
+  height: 300px;
+  margin: 0 auto;
+  padding-top: 50px;
+}
+
+input, button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  background: url("/static/Images/button.png") center/cover no-repeat;
+  width: 200px;
+  color: white;
+}
+
+button:hover {
+  background: url("/static/Images/button_hover.png") center/cover no-repeat;
+  transform: scale(1.05);
+  transition: 0.2s;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  padding: 10px 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.notification img {
+  width: 32px;
+  height: 32px;
+}
+
+.notification.hidden {
+  display: none;
+}
